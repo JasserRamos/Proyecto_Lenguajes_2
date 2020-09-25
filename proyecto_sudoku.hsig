@@ -1,0 +1,67 @@
+module Main where
+
+estaLleno :: [[Int]] -> Bool
+estaLleno tablero = sum [1 | x <- tablero, 0 `elem` x] == 0
+
+findCeros :: [[Int]] -> [[Int]]
+findCeros tablero = [[y | y <- [0..((length tablero)-1)], (tablero !!x !!y) == 0] | x <- [0..((length tablero)-1)]]
+
+cuadro :: Int -> Int -> Int
+-- 3 x 3
+cuadro 3 x =
+    if(x `elem` [0..2])
+    then 0        
+    else if(x `elem` [3..5])
+        then 3        
+        else if(x `elem` [6..8])
+            then 6
+            else -1 
+cuadro 4 x =
+    if(x `elem` [0..3])
+    then 0        
+    else if(x `elem` [4..7])
+        then 4        
+        else if(x `elem` [8..11])
+            then 8
+            else if(x `elem` [12..15])
+                then 12
+                else -1
+cuadro n x = -1
+
+mapUnavailable :: [[Int]] -> Int -> Int -> Int -> [Int]
+mapUnavailable tablero n i j = 
+    (tablero !!i) ++
+    [y !!j | y <- tablero, (y !!j) /= 0] ++
+    [[s | s <- take n (drop (cuadro n i) ([take n (drop (cuadro n j) z) | z <- tablero]))] !!h !!v 
+        | h <- [0..(n-1)], v <- [0..(n-1)]] 
+posibilidades :: [[Int]] -> Int -> Int -> Int -> [Int]
+posibilidades tablero n i j = [x | x <- [1..(length tablero)], notElem x (mapUnavailable tablero n i j) ]
+
+resolver :: [[Int]] -> Int -> [[Int]]
+resolver tablero  n =
+    if(estaLleno tablero) then
+      tablero
+    else
+      [[-1]]
+
+mult :: Int -> Int -> [Int] -> [Int]
+mult _ 4 xs = xs
+mult pos n xs =
+  if(xs !!n == 0) then
+    mult pos (n+1) (take n xs ++ [head (posibilidades tablero 0 pos n)] ++ drop (n + 1) xs)
+  else
+    mult pos (n+1) xs
+
+tablero :: [[Int]]
+tablero = [[0, 3, 4, 0],
+         [4, 0, 0, 2],
+         [1, 0, 0, 3],
+         [0, 2, 1, 0]]
+
+-- #main
+main = do
+    putStrLn "\nTablero original" 
+    putStrLn (show tablero)
+    putStrLn "\nTablero Resuelto" 
+    putStrLn (show [mult 0 0 (tablero !!0), mult 1 0 (tablero !!1), mult 2 0 (tablero !!2), mult 3 0 (tablero !!3)])
+-- Fin main
