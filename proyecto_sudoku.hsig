@@ -1,3 +1,4 @@
+--MAIN
 module Main where
 
 estaLleno :: [[Int]] -> Bool
